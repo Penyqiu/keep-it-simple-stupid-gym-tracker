@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">GYM Tracker</string>
+
+    <!-- Nawigacja -->
+    <string name="nav_home">Strona główna</string>
+    <string name="nav_plans">Plany</string>
+    <string name="nav_history">Historia</string>
+    <string name="nav_progress">Postępy</string>
+    <string name="nav_exercises">Ćwiczenia</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_1_title">Śledź Treningi</string>
+    <string name="onboarding_1_desc">Zapisuj każdą serię i powtórzenie. Buduj pełną historię treningów.</string>
+    <string name="onboarding_2_title">Mierz Postępy</string>
+    <string name="onboarding_2_desc">Obserwuj swoje rekordy i patrz jak rośnie Twoja siła.</string>
+    <string name="onboarding_3_title">Zdobywaj Osiągnięcia</string>
+    <string name="onboarding_3_desc">Motywuj się odblokowując osiągnięcia przy każdym kamieniu milowym.</string>
+    <string name="onboarding_get_started">Zaczynamy!</string>
+    <string name="skip">Pomiń</string>
+    <string name="next">Dalej</string>
+
+    <!-- Strona główna -->
+    <string name="total_workouts">Łącznie treningów</string>
+    <string name="current_streak">Seria</string>
+    <string name="quick_start">Szybki start</string>
+    <string name="from_plan">Z planu</string>
+    <string name="recent_workouts">Ostatnie treningi</string>
+    <string name="no_workouts_yet">Brak treningów.\nRozpocznij pierwszą sesję!</string>
+    <string name="quick_workout">Szybki trening</string>
+    <string name="select_plan">Wybierz plan</string>
+    <string name="no_plans_yet">Brak planów</string>
+
+    <!-- Plany -->
+    <string name="create_plan">Utwórz plan</string>
+    <string name="plan_name">Nazwa planu</string>
+    <string name="create">Utwórz</string>
+    <string name="start">Start</string>
+    <string name="add_exercise">Dodaj ćwiczenie</string>
+    <string name="move_up">Przesuń w górę</string>
+    <string name="move_down">Przesuń w dół</string>
+    <string name="remove">Usuń</string>
+    <string name="search">Szukaj</string>
+    <string name="close">Zamknij</string>
+
+    <!-- Trening -->
+    <string name="active_workout">Aktywny trening</string>
+    <string name="finish">Zakończ</string>
+    <string name="finish_workout">Zakończ trening</string>
+    <string name="finish_workout_confirm">Czy na pewno chcesz zakończyć ten trening?</string>
+    <string name="cancel">Anuluj</string>
+    <string name="rest_timer_running">Odliczanie przerwy</string>
+    <string name="skip_rest">Pomiń</string>
+    <string name="weight_kg">Ciężar (kg)</string>
+    <string name="reps">Powtórzenia</string>
+    <string name="add_set">Dodaj serię</string>
+    <string name="set">Seria</string>
+
+    <!-- Historia -->
+    <string name="list">Lista</string>
+    <string name="calendar">Kalendarz</string>
+    <string name="repeat">Powtórz</string>
+    <string name="delete">Usuń</string>
+
+    <!-- Postępy -->
+    <string name="exercise_progress">Postępy ćwiczenia</string>
+    <string name="personal_record">Rekord osobisty</string>
+    <string name="estimated_1rm">Szacowane 1RM (Epley)</string>
+    <string name="no_history_yet">Ukończ treningi, aby zobaczyć postępy</string>
+    <string name="select_exercise">Wybierz ćwiczenie</string>
+    <string name="body_weight">Masa ciała</string>
+    <string name="add_body_weight">Zapisz masę ciała</string>
+    <string name="add">Dodaj</string>
+
+    <!-- Ćwiczenia -->
+    <string name="all">Wszystkie</string>
+    <string name="no_exercises">Brak ćwiczeń</string>
+    <string name="add_custom_exercise">Dodaj własne ćwiczenie</string>
+    <string name="exercise_name">Nazwa ćwiczenia</string>
+    <string name="muscle_group">Grupa mięśniowa</string>
+
+    <!-- Ustawienia -->
+    <string name="settings">Ustawienia</string>
+    <string name="appearance">Wygląd</string>
+    <string name="dark_theme">Ciemny motyw</string>
+    <string name="units">Jednostki</string>
+    <string name="use_kg">Używaj kilogramów</string>
+    <string name="rest_timer">Timer przerwy</string>
+    <string name="rest_duration">Czas przerwy</string>
+    <string name="tools">Narzędzia</string>
+    <string name="plates_calculator">Kalkulator talerzy</string>
+    <string name="plates_calculator_desc">Oblicz potrzebne talerze dla docelowego ciężaru</string>
+    <string name="target_weight">Docelowy ciężar (%1$s)</string>
+    <string name="bar">Gryf</string>
+    <string name="plates_per_side">Talerze na stronę:</string>
+    <string name="weight_too_low">Ciężar musi być większy niż masa gryfu</string>
+
+    <!-- Osiągnięcia -->
+    <string name="achievements">Osiągnięcia</string>
+
+    <string name="ach_workout_1_title">Pierwszy krok</string>
+    <string name="ach_workout_1_desc">Ukończ pierwszy trening</string>
+    <string name="ach_workout_10_title">Na poważnie</string>
+    <string name="ach_workout_10_desc">Ukończ 10 treningów</string>
+    <string name="ach_workout_50_title">Zaangażowany</string>
+    <string name="ach_workout_50_desc">Ukończ 50 treningów</string>
+    <string name="ach_workout_100_title">Klub setki</string>
+    <string name="ach_workout_100_desc">Ukończ 100 treningów</string>
+
+    <string name="ach_streak_3_title">W biegu</string>
+    <string name="ach_streak_3_desc">Trenuj 3 dni z rzędu</string>
+    <string name="ach_streak_7_title">Wojownik tygodnia</string>
+    <string name="ach_streak_7_desc">Trenuj 7 dni z rzędu</string>
+    <string name="ach_streak_30_title">Żelazna wola</string>
+    <string name="ach_streak_30_desc">Trenuj 30 dni z rzędu</string>
+
+    <string name="ach_volume_10k_title">Ruszam ciężar</string>
+    <string name="ach_volume_10k_desc">Podnieś łącznie 10 000 kg</string>
+    <string name="ach_volume_100k_title">Król wolumenu</string>
+    <string name="ach_volume_100k_desc">Podnieś łącznie 100 000 kg</string>
+    <string name="ach_volume_1m_title">Legenda tonażu</string>
+    <string name="ach_volume_1m_desc">Podnieś łącznie 1 000 000 kg</string>
+
+    <string name="ach_weight_100kg_title">Trzycyfrowy</string>
+    <string name="ach_weight_100kg_desc">Podnieś 100 kg w jednej serii</string>
+    <string name="ach_weekly_5_title">5 dni w tygodniu</string>
+    <string name="ach_weekly_5_desc">Trenuj 5 razy w jednym tygodniu</string>
+
+    <!-- Ogólne -->
+    <string name="back">Wstecz</string>
+    <string name="export_csv">Eksportuj CSV</string>
+</resources>

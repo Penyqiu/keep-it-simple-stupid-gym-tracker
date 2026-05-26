@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">GYM Tracker</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_plans">Plans</string>
+    <string name="nav_history">History</string>
+    <string name="nav_progress">Progress</string>
+    <string name="nav_exercises">Exercises</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_1_title">Track Your Workouts</string>
+    <string name="onboarding_1_desc">Log every set and rep. Build a complete history of your training.</string>
+    <string name="onboarding_2_title">Measure Progress</string>
+    <string name="onboarding_2_desc">See your personal records and watch your strength grow over time.</string>
+    <string name="onboarding_3_title">Earn Achievements</string>
+    <string name="onboarding_3_desc">Stay motivated by unlocking achievements as you hit milestones.</string>
+    <string name="onboarding_get_started">Get Started</string>
+    <string name="skip">Skip</string>
+    <string name="next">Next</string>
+
+    <!-- Home -->
+    <string name="total_workouts">Total Workouts</string>
+    <string name="current_streak">Streak</string>
+    <string name="quick_start">Quick Start</string>
+    <string name="from_plan">From Plan</string>
+    <string name="recent_workouts">Recent Workouts</string>
+    <string name="no_workouts_yet">No workouts yet.\nStart your first session!</string>
+    <string name="quick_workout">Quick Workout</string>
+    <string name="select_plan">Select Plan</string>
+    <string name="no_plans_yet">No plans yet</string>
+
+    <!-- Plans -->
+    <string name="create_plan">Create Plan</string>
+    <string name="plan_name">Plan Name</string>
+    <string name="create">Create</string>
+    <string name="start">Start</string>
+    <string name="add_exercise">Add Exercise</string>
+    <string name="move_up">Move Up</string>
+    <string name="move_down">Move Down</string>
+    <string name="remove">Remove</string>
+    <string name="search">Search</string>
+    <string name="close">Close</string>
+
+    <!-- Workout -->
+    <string name="active_workout">Active Workout</string>
+    <string name="finish">Finish</string>
+    <string name="finish_workout">Finish Workout</string>
+    <string name="finish_workout_confirm">Are you sure you want to finish this workout?</string>
+    <string name="cancel">Cancel</string>
+    <string name="rest_timer_running">Rest Timer Running</string>
+    <string name="skip_rest">Skip</string>
+    <string name="weight_kg">Weight (kg)</string>
+    <string name="reps">Reps</string>
+    <string name="add_set">Add Set</string>
+    <string name="set">Set</string>
+
+    <!-- History -->
+    <string name="list">List</string>
+    <string name="calendar">Calendar</string>
+    <string name="repeat">Repeat</string>
+    <string name="delete">Delete</string>
+
+    <!-- Progress -->
+    <string name="exercise_progress">Exercise Progress</string>
+    <string name="personal_record">Personal Record</string>
+    <string name="estimated_1rm">Estimated 1RM (Epley)</string>
+    <string name="no_history_yet">Complete workouts to see progress</string>
+    <string name="select_exercise">Select Exercise</string>
+    <string name="body_weight">Body Weight</string>
+    <string name="add_body_weight">Log Body Weight</string>
+    <string name="add">Add</string>
+
+    <!-- Exercises -->
+    <string name="all">All</string>
+    <string name="no_exercises">No exercises found</string>
+    <string name="add_custom_exercise">Add Custom Exercise</string>
+    <string name="exercise_name">Exercise Name</string>
+    <string name="muscle_group">Muscle Group</string>
+
+    <!-- Settings -->
+    <string name="settings">Settings</string>
+    <string name="appearance">Appearance</string>
+    <string name="dark_theme">Dark Theme</string>
+    <string name="units">Units</string>
+    <string name="use_kg">Use Kilograms</string>
+    <string name="rest_timer">Rest Timer</string>
+    <string name="rest_duration">Rest Duration</string>
+    <string name="tools">Tools</string>
+    <string name="plates_calculator">Plates Calculator</string>
+    <string name="plates_calculator_desc">Calculate plates needed for a target weight</string>
+    <string name="target_weight">Target Weight (%1$s)</string>
+    <string name="bar">Bar</string>
+    <string name="plates_per_side">Plates per side:</string>
+    <string name="weight_too_low">Weight must be greater than bar weight</string>
+
+    <!-- Achievements -->
+    <string name="achievements">Achievements</string>
+
+    <string name="ach_workout_1_title">First Step</string>
+    <string name="ach_workout_1_desc">Complete your first workout</string>
+    <string name="ach_workout_10_title">Getting Serious</string>
+    <string name="ach_workout_10_desc">Complete 10 workouts</string>
+    <string name="ach_workout_50_title">Dedicated</string>
+    <string name="ach_workout_50_desc">Complete 50 workouts</string>
+    <string name="ach_workout_100_title">Century Club</string>
+    <string name="ach_workout_100_desc">Complete 100 workouts</string>
+
+    <string name="ach_streak_3_title">On a Roll</string>
+    <string name="ach_streak_3_desc">Work out 3 days in a row</string>
+    <string name="ach_streak_7_title">Week Warrior</string>
+    <string name="ach_streak_7_desc">Work out 7 days in a row</string>
+    <string name="ach_streak_30_title">Iron Will</string>
+    <string name="ach_streak_30_desc">Work out 30 days in a row</string>
+
+    <string name="ach_volume_10k_title">Moving Weight</string>
+    <string name="ach_volume_10k_desc">Lift 10,000 kg total volume</string>
+    <string name="ach_volume_100k_title">Volume King</string>
+    <string name="ach_volume_100k_desc">Lift 100,000 kg total volume</string>
+    <string name="ach_volume_1m_title">Tonnage Legend</string>
+    <string name="ach_volume_1m_desc">Lift 1,000,000 kg total volume</string>
+
+    <string name="ach_weight_100kg_title">Triple Digits</string>
+    <string name="ach_weight_100kg_desc">Lift 100 kg in a single set</string>
+    <string name="ach_weekly_5_title">5-Day Week</string>
+    <string name="ach_weekly_5_desc">Work out 5 times in one week</string>
+
+    <!-- General -->
+    <string name="back">Back</string>
+    <string name="export_csv">Export CSV</string>
+</resources>

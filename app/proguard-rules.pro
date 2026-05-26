@@ -1,0 +1,3 @@
+-keep class com.gymtracker.app.data.db.** { *; }
+-keepnames class androidx.navigation.fragment.NavHostFragment
+-keep class dagger.hilt.** { *; }
