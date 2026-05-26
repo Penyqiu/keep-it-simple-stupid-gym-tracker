@@ -29,4 +29,19 @@ interface ExerciseDao {
 
     @Query("SELECT COUNT(*) FROM exercises")
     suspend fun countExercises(): Int
+
+    @Query("SELECT name FROM exercises WHERE isCustom = 0")
+    suspend fun getSeedExerciseNames(): List<String>
+
+    @Query("SELECT * FROM exercises WHERE isCustom = 1 ORDER BY id")
+    suspend fun getCustomExercisesOnce(): List<ExerciseEntity>
+
+    @Query("DELETE FROM exercises WHERE isCustom = 1")
+    suspend fun deleteAllCustomExercises()
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertForRestore(exercise: ExerciseEntity)
+
+    @Query("UPDATE exercises SET description = :description WHERE name = :name AND isCustom = 0")
+    suspend fun updateDescriptionByName(name: String, description: String)
 }

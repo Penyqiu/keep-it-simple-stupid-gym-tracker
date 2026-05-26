@@ -23,9 +23,7 @@ class PlanDetailViewModel @Inject constructor(
 
     val plan: StateFlow<WorkoutPlanEntity?> = _planId
         .filterNotNull()
-        .flatMapLatest { id ->
-            flow { emit(workoutPlanRepository.getPlanById(id)) }
-        }
+        .flatMapLatest { id -> workoutPlanRepository.getPlanByIdFlow(id) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     val exercises: StateFlow<List<ExerciseEntity>> = _planId
@@ -36,8 +34,29 @@ class PlanDetailViewModel @Inject constructor(
     val allExercises = exerciseRepository.getAllExercises()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
+    val scheduledDays: StateFlow<Set<Int>> = plan
+        .map { p ->
+            p?.daysOfWeek
+                ?.split(",")
+                ?.filter { it.isNotBlank() }
+                ?.mapNotNull { it.toIntOrNull() }
+                ?.toSet() ?: emptySet()
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptySet())
+
     fun loadPlan(planId: Long) {
         _planId.value = planId
+    }
+
+    fun toggleScheduledDay(day: Int) = viewModelScope.launch {
+        val currentPlan = plan.value ?: return@launch
+        val newDays = if (day in scheduledDays.value)
+            scheduledDays.value - day
+        else
+            scheduledDays.value + day
+        workoutPlanRepository.updatePlan(
+            currentPlan.copy(daysOfWeek = newDays.sorted().joinToString(","))
+        )
     }
 
     fun addExercise(exerciseId: Long) = viewModelScope.launch {

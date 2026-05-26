@@ -22,7 +22,13 @@ class ExerciseRepository @Inject constructor(
     suspend fun addExercise(name: String, muscleGroup: String, isCustom: Boolean = true): Long =
         exerciseDao.insertExercise(ExerciseEntity(name = name, muscleGroup = muscleGroup, isCustom = isCustom))
 
-    suspend fun seedExercises(exercises: List<ExerciseEntity>) = exerciseDao.insertExercises(exercises)
+    suspend fun seedExercises(exercises: List<ExerciseEntity>) {
+        val existing = exerciseDao.getSeedExerciseNames().toSet()
+        val toInsert = exercises.filter { it.name !in existing }
+        if (toInsert.isNotEmpty()) exerciseDao.insertExercises(toInsert)
+        exercises.filter { it.name in existing && it.description.isNotBlank() }
+            .forEach { exerciseDao.updateDescriptionByName(it.name, it.description) }
+    }
 
     suspend fun deleteExercise(exercise: ExerciseEntity) = exerciseDao.deleteExercise(exercise)
 

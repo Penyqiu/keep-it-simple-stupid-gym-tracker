@@ -4,6 +4,7 @@ import com.gymtracker.app.data.db.dao.WorkoutPlanDao
 import com.gymtracker.app.data.db.entity.ExerciseEntity
 import com.gymtracker.app.data.db.entity.PlanExerciseEntity
 import com.gymtracker.app.data.db.entity.WorkoutPlanEntity
+import com.gymtracker.app.data.db.model.PlanWithCount
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -14,7 +15,11 @@ class WorkoutPlanRepository @Inject constructor(
 ) {
     fun getAllPlans(): Flow<List<WorkoutPlanEntity>> = workoutPlanDao.getAllPlans()
 
+    fun getAllPlansWithCount(): Flow<List<PlanWithCount>> = workoutPlanDao.getAllPlansWithCount()
+
     suspend fun getPlanById(id: Long): WorkoutPlanEntity? = workoutPlanDao.getPlanById(id)
+
+    fun getPlanByIdFlow(id: Long): Flow<WorkoutPlanEntity?> = workoutPlanDao.getPlanByIdFlow(id)
 
     fun getExercisesForPlan(planId: Long): Flow<List<ExerciseEntity>> =
         workoutPlanDao.getExercisesForPlan(planId)

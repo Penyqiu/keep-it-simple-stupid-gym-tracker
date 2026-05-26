@@ -4,6 +4,7 @@ import androidx.room.*
 import com.gymtracker.app.data.db.entity.ExerciseEntity
 import com.gymtracker.app.data.db.entity.PlanExerciseEntity
 import com.gymtracker.app.data.db.entity.WorkoutPlanEntity
+import com.gymtracker.app.data.db.model.PlanWithCount
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -11,8 +12,21 @@ interface WorkoutPlanDao {
     @Query("SELECT * FROM workout_plans ORDER BY createdAt DESC")
     fun getAllPlans(): Flow<List<WorkoutPlanEntity>>
 
+    @Query("""
+        SELECT p.id, p.name, p.daysOfWeek, p.createdAt,
+               COUNT(DISTINCT pe.id) as exerciseCount
+        FROM workout_plans p
+        LEFT JOIN plan_exercises pe ON pe.planId = p.id
+        GROUP BY p.id
+        ORDER BY p.createdAt DESC
+    """)
+    fun getAllPlansWithCount(): Flow<List<PlanWithCount>>
+
     @Query("SELECT * FROM workout_plans WHERE id = :id")
     suspend fun getPlanById(id: Long): WorkoutPlanEntity?
+
+    @Query("SELECT * FROM workout_plans WHERE id = :id")
+    fun getPlanByIdFlow(id: Long): Flow<WorkoutPlanEntity?>
 
     @Insert
     suspend fun insertPlan(plan: WorkoutPlanEntity): Long
@@ -43,4 +57,19 @@ interface WorkoutPlanDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun updatePlanExercises(planExercises: List<PlanExerciseEntity>)
+
+    @Query("SELECT * FROM workout_plans ORDER BY createdAt DESC")
+    suspend fun getAllPlansOnce(): List<WorkoutPlanEntity>
+
+    @Query("SELECT * FROM plan_exercises ORDER BY planId, orderIndex")
+    suspend fun getAllPlanExercises(): List<PlanExerciseEntity>
+
+    @Query("DELETE FROM workout_plans")
+    suspend fun deleteAllPlans()
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertPlanForRestore(plan: WorkoutPlanEntity)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertPlanExerciseForRestore(planExercise: PlanExerciseEntity)
 }

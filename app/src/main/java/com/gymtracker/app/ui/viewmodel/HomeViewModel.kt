@@ -2,6 +2,7 @@ package com.gymtracker.app.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.gymtracker.app.data.db.model.SessionWithStats
 import com.gymtracker.app.data.repository.WorkoutPlanRepository
 import com.gymtracker.app.data.repository.WorkoutRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,7 +22,7 @@ class HomeViewModel @Inject constructor(
     private val workoutPlanRepository: WorkoutPlanRepository
 ) : ViewModel() {
 
-    val recentSessions = workoutRepository.getRecentSessions(5)
+    val recentSessions: StateFlow<List<SessionWithStats>> = workoutRepository.getRecentSessionsWithStats(5)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     val allPlans = workoutPlanRepository.getAllPlans()

@@ -1,3 +1,5 @@
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+
 package com.gymtracker.app.ui.screens.achievements
 
 import androidx.compose.foundation.layout.*

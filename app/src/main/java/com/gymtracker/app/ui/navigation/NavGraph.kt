@@ -1,3 +1,5 @@
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+
 package com.gymtracker.app.ui.navigation
 
 import androidx.compose.foundation.layout.padding
@@ -11,6 +13,8 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.*
 import com.gymtracker.app.R
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 import com.gymtracker.app.ui.screens.achievements.AchievementsScreen
 import com.gymtracker.app.ui.screens.exercises.ExerciseLibraryScreen
 import com.gymtracker.app.ui.screens.history.HistoryScreen
@@ -21,6 +25,7 @@ import com.gymtracker.app.ui.screens.plans.PlansScreen
 import com.gymtracker.app.ui.screens.progress.ProgressScreen
 import com.gymtracker.app.ui.screens.settings.SettingsScreen
 import com.gymtracker.app.ui.screens.workout.ActiveWorkoutScreen
+import com.gymtracker.app.ui.screens.workout.WorkoutSummaryScreen
 import com.gymtracker.app.ui.viewmodel.SettingsViewModel
 
 private data class BottomNavItem(
@@ -121,13 +126,28 @@ fun NavGraph(
                     onBack = { navController.popBackStack() }
                 )
             }
-            composable(Screen.ActiveWorkout.route) { backStackEntry ->
-                val sessionId = backStackEntry.arguments?.getString("sessionId")?.toLong() ?: return@composable
+            composable(
+                route = Screen.ActiveWorkout.route,
+                arguments = listOf(navArgument("sessionId") { type = NavType.LongType })
+            ) { backStackEntry ->
+                val sessionId = backStackEntry.arguments?.getLong("sessionId") ?: return@composable
                 ActiveWorkoutScreen(
                     sessionId = sessionId,
-                    onFinish = {
+                    onWorkoutFinished = { finishedId ->
+                        navController.navigate(Screen.WorkoutSummary.createRoute(finishedId)) {
+                            popUpTo(Screen.ActiveWorkout.route) { inclusive = true }
+                        }
+                    }
+                )
+            }
+            composable(
+                route = Screen.WorkoutSummary.route,
+                arguments = listOf(navArgument("sessionId") { type = NavType.LongType })
+            ) {
+                WorkoutSummaryScreen(
+                    onDone = {
                         navController.navigate(Screen.Home.route) {
-                            popUpTo(Screen.Home.route) { inclusive = true }
+                            popUpTo(0) { inclusive = true }
                         }
                     }
                 )

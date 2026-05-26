@@ -33,13 +33,16 @@ class HistoryViewModel @Inject constructor(
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyMap())
 
-    val workoutDates: StateFlow<Set<java.time.LocalDate>> = allSessions
+    val workoutsByDate: StateFlow<Map<java.time.LocalDate, List<String?>>> = allSessions
         .map { sessions ->
-            sessions.filter { it.finishedAt != null }.map { session ->
-                Instant.ofEpochMilli(session.startedAt).atZone(ZoneId.systemDefault()).toLocalDate()
-            }.toSet()
+            sessions.filter { it.finishedAt != null }
+                .groupBy { session ->
+                    Instant.ofEpochMilli(session.startedAt)
+                        .atZone(ZoneId.systemDefault()).toLocalDate()
+                }
+                .mapValues { (_, list) -> list.map { it.planName } }
         }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptySet())
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyMap())
 
     fun deleteSession(session: WorkoutSessionEntity) = viewModelScope.launch {
         workoutRepository.deleteSession(session)
@@ -57,7 +60,7 @@ class HistoryViewModel @Inject constructor(
             sessions.forEach { session ->
                 val date = Instant.ofEpochMilli(session.startedAt)
                     .atZone(ZoneId.systemDefault()).format(dateFormat)
-                val planName = session.planName ?: "Quick Workout"
+                val planName = session.planName ?: context.getString(com.gymtracker.app.R.string.quick_workout)
                 val sets = workoutRepository.getSetsForSessionOnce(session.id)
                 sets.forEach { set ->
                     writer.write("$date,$planName,${set.exerciseName},${set.setNumber},${set.weight},${set.reps}\n")

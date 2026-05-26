@@ -1,3 +1,5 @@
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+
 package com.gymtracker.app.ui.screens.home
 
 import androidx.compose.foundation.layout.*
@@ -14,6 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.gymtracker.app.R
+import com.gymtracker.app.data.db.model.SessionWithStats
 import com.gymtracker.app.ui.components.AdBannerView
 import com.gymtracker.app.ui.components.EmptyState
 import com.gymtracker.app.ui.viewmodel.HomeViewModel
@@ -61,12 +64,14 @@ fun HomeScreen(
                     StatCard(
                         modifier = Modifier.weight(1f),
                         label = stringResource(R.string.total_workouts),
-                        value = uiState.totalWorkouts.toString()
+                        value = uiState.totalWorkouts.toString(),
+                        icon = Icons.Default.FitnessCenter
                     )
                     StatCard(
                         modifier = Modifier.weight(1f),
                         label = stringResource(R.string.current_streak),
-                        value = "${uiState.currentStreak}d"
+                        value = "${uiState.currentStreak}d",
+                        icon = Icons.Default.Whatshot
                     )
                 }
             }
@@ -143,26 +148,84 @@ fun HomeScreen(
 }
 
 @Composable
-private fun StatCard(modifier: Modifier = Modifier, label: String, value: String) {
+private fun StatCard(
+    modifier: Modifier = Modifier,
+    label: String,
+    value: String,
+    icon: androidx.compose.ui.graphics.vector.ImageVector
+) {
     Card(modifier = modifier) {
         Column(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(16.dp).fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Icon(icon, contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(20.dp))
+            Spacer(Modifier.height(4.dp))
             Text(value, style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
-            Text(label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(label, style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }
 
 @Composable
-private fun RecentSessionCard(session: com.gymtracker.app.data.db.entity.WorkoutSessionEntity) {
-    val dateFormat = remember { SimpleDateFormat("dd MMM, HH:mm", Locale.getDefault()) }
+private fun RecentSessionCard(session: SessionWithStats) {
+    val dateFormat = remember { SimpleDateFormat("EEE, dd MMM", Locale.getDefault()) }
+    val timeFormat = remember { SimpleDateFormat("HH:mm", Locale.getDefault()) }
+    val durationMin = session.finishedAt?.let { (it - session.startedAt) / 60_000 } ?: 0L
+
     Card(modifier = Modifier.fillMaxWidth()) {
-        ListItem(
-            headlineContent = { Text(session.planName ?: stringResource(R.string.quick_workout)) },
-            supportingContent = { Text(dateFormat.format(Date(session.startedAt))) },
-            leadingContent = { Icon(Icons.Default.FitnessCenter, contentDescription = null) }
-        )
+        Row(
+            modifier = Modifier.padding(16.dp).fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Surface(
+                shape = MaterialTheme.shapes.medium,
+                color = MaterialTheme.colorScheme.primaryContainer,
+                modifier = Modifier.size(48.dp)
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(Icons.Default.FitnessCenter, contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer)
+                }
+            }
+            Spacer(Modifier.width(12.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    session.planName ?: stringResource(R.string.quick_workout),
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Spacer(Modifier.height(2.dp))
+                Text(
+                    "${dateFormat.format(Date(session.startedAt))} · ${timeFormat.format(Date(session.startedAt))}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(Modifier.height(4.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    StatChip(icon = Icons.Default.Timer, text = "$durationMin min")
+                    StatChip(icon = Icons.Default.FitnessCenter,
+                        text = "${session.exerciseCount} ${stringResource(R.string.exercises_short)}")
+                    if (session.volume > 0) {
+                        StatChip(icon = Icons.Default.Scale,
+                            text = "${"%.0f".format(session.volume)} kg")
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun StatChip(icon: androidx.compose.ui.graphics.vector.ImageVector, text: String) {
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(3.dp)) {
+        Icon(icon, contentDescription = null,
+            modifier = Modifier.size(12.dp),
+            tint = MaterialTheme.colorScheme.primary)
+        Text(text, style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }

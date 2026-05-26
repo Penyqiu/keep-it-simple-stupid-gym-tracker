@@ -3,6 +3,7 @@ package com.gymtracker.app.data.repository
 import com.gymtracker.app.data.db.dao.SessionDao
 import com.gymtracker.app.data.db.entity.WorkoutSessionEntity
 import com.gymtracker.app.data.db.entity.WorkoutSetEntity
+import com.gymtracker.app.data.db.model.SessionWithStats
 import kotlinx.coroutines.flow.Flow
 import java.time.Instant
 import java.time.ZoneId
@@ -17,6 +18,9 @@ class WorkoutRepository @Inject constructor(
 
     fun getRecentSessions(limit: Int = 5): Flow<List<WorkoutSessionEntity>> =
         sessionDao.getRecentSessions(limit)
+
+    fun getRecentSessionsWithStats(limit: Int = 5): Flow<List<SessionWithStats>> =
+        sessionDao.getRecentSessionsWithStats(limit)
 
     suspend fun getSessionById(id: Long): WorkoutSessionEntity? = sessionDao.getSessionById(id)
 
@@ -91,6 +95,9 @@ class WorkoutRepository @Inject constructor(
     suspend fun getMaxWeightForExercise(exerciseId: Long): Double? =
         sessionDao.getMaxWeightForExercise(exerciseId)
 
+    suspend fun getSessionCountForExercise(exerciseId: Long): Int =
+        sessionDao.getSessionCountForExercise(exerciseId)
+
     suspend fun getMaxSingleSetWeight(): Double? = sessionDao.getMaxSingleSetWeight()
 
     suspend fun getMaxWorkoutsInAnyWeek(): Int {
@@ -109,6 +116,45 @@ class WorkoutRepository @Inject constructor(
         sessionDao.getPreviousSessionSets(exerciseId, excludeSessionId)
 
     fun getTotalWorkoutCountFlow(): Flow<Int> = sessionDao.getTotalWorkoutCountFlow()
+
+    suspend fun getMaxWeightBeforeSession(exerciseId: Long, sessionId: Long): Double? =
+        sessionDao.getMaxWeightBeforeSession(exerciseId, sessionId)
+
+    suspend fun getLongestStreak(): Int {
+        val dates = sessionDao.getAllWorkoutDates()
+            .map { Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()).toLocalDate() }
+            .distinct()
+            .sorted()
+        if (dates.isEmpty()) return 0
+        var maxStreak = 1
+        var current = 1
+        for (i in 1 until dates.size) {
+            if (dates[i] == dates[i - 1].plusDays(1)) {
+                current++
+                if (current > maxStreak) maxStreak = current
+            } else {
+                current = 1
+            }
+        }
+        return maxStreak
+    }
+
+    suspend fun getFavouriteDayOfWeek(): String? {
+        val dayNames = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+        val dates = sessionDao.getAllWorkoutDates()
+            .map { Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()).toLocalDate() }
+        if (dates.isEmpty()) return null
+        val best = dates.groupBy { it.dayOfWeek.value - 1 }.maxByOrNull { it.value.size }?.key ?: return null
+        return dayNames[best]
+    }
+
+    suspend fun getTopExercises(limit: Int = 5): List<Pair<String, Int>> =
+        sessionDao.getAllCompletedSetExerciseNames()
+            .groupBy { it }
+            .mapValues { it.value.size }
+            .toList()
+            .sortedByDescending { it.second }
+            .take(limit)
 
     suspend fun checkAndUnlockAchievements(achievementRepository: AchievementRepository) {
         val totalWorkouts = getTotalWorkoutCount()

@@ -3,6 +3,7 @@ package com.gymtracker.app.data.db.dao
 import androidx.room.*
 import com.gymtracker.app.data.db.entity.WorkoutSessionEntity
 import com.gymtracker.app.data.db.entity.WorkoutSetEntity
+import com.gymtracker.app.data.db.model.SessionWithStats
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -12,6 +13,19 @@ interface SessionDao {
 
     @Query("SELECT * FROM workout_sessions WHERE finishedAt IS NOT NULL ORDER BY startedAt DESC LIMIT :limit")
     fun getRecentSessions(limit: Int = 5): Flow<List<WorkoutSessionEntity>>
+
+    @Query("""
+        SELECT s.id, s.planId, s.planName, s.startedAt, s.finishedAt,
+               COUNT(DISTINCT ws.exerciseId) as exerciseCount,
+               COALESCE(SUM(ws.weight * ws.reps), 0.0) as volume
+        FROM workout_sessions s
+        LEFT JOIN workout_sets ws ON ws.sessionId = s.id AND ws.isCompleted = 1
+        WHERE s.finishedAt IS NOT NULL
+        GROUP BY s.id
+        ORDER BY s.startedAt DESC
+        LIMIT :limit
+    """)
+    fun getRecentSessionsWithStats(limit: Int): Flow<List<SessionWithStats>>
 
     @Query("SELECT * FROM workout_sessions WHERE id = :id")
     suspend fun getSessionById(id: Long): WorkoutSessionEntity?
@@ -86,4 +100,28 @@ interface SessionDao {
 
     @Query("SELECT COUNT(*) FROM workout_sessions WHERE finishedAt IS NOT NULL")
     fun getTotalWorkoutCountFlow(): Flow<Int>
+
+    @Query("SELECT MAX(weight) FROM workout_sets WHERE exerciseId = :exerciseId AND sessionId IN (SELECT id FROM workout_sessions WHERE finishedAt IS NOT NULL AND id != :excludeSessionId)")
+    suspend fun getMaxWeightBeforeSession(exerciseId: Long, excludeSessionId: Long): Double?
+
+    @Query("SELECT exerciseName FROM workout_sets WHERE sessionId IN (SELECT id FROM workout_sessions WHERE finishedAt IS NOT NULL)")
+    suspend fun getAllCompletedSetExerciseNames(): List<String>
+
+    @Query("SELECT * FROM workout_sessions ORDER BY id")
+    suspend fun getAllSessionsOnce(): List<WorkoutSessionEntity>
+
+    @Query("SELECT * FROM workout_sets ORDER BY id")
+    suspend fun getAllSetsOnce(): List<WorkoutSetEntity>
+
+    @Query("SELECT COUNT(DISTINCT sessionId) FROM workout_sets WHERE exerciseId = :exerciseId AND sessionId IN (SELECT id FROM workout_sessions WHERE finishedAt IS NOT NULL)")
+    suspend fun getSessionCountForExercise(exerciseId: Long): Int
+
+    @Query("DELETE FROM workout_sessions")
+    suspend fun deleteAllSessions()
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertSessionForRestore(session: WorkoutSessionEntity)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertSetForRestore(set: WorkoutSetEntity)
 }

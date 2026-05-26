@@ -10,9 +10,9 @@ import com.gymtracker.app.data.repository.AchievementRepository
 import com.gymtracker.app.data.repository.ExerciseRepository
 import com.gymtracker.app.data.repository.WorkoutPlanRepository
 import com.gymtracker.app.data.repository.WorkoutRepository
-import com.gymtracker.app.service.RestTimerService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -21,7 +21,8 @@ data class WorkoutExercise(
     val exerciseId: Long,
     val exerciseName: String,
     val sets: List<WorkoutSetEntity> = emptyList(),
-    val previousSets: List<WorkoutSetEntity> = emptyList()
+    val previousSets: List<WorkoutSetEntity> = emptyList(),
+    val suggestedWeight: Double? = null
 )
 
 @HiltViewModel
@@ -50,6 +51,14 @@ class WorkoutViewModel @Inject constructor(
     private val _restTimerRunning = MutableStateFlow(false)
     val restTimerRunning: StateFlow<Boolean> = _restTimerRunning
 
+    private val _restSecondsLeft = MutableStateFlow(0)
+    val restSecondsLeft: StateFlow<Int> = _restSecondsLeft
+
+    private val _restTotalSeconds = MutableStateFlow(0)
+    val restTotalSeconds: StateFlow<Int> = _restTotalSeconds
+
+    private var timerJob: kotlinx.coroutines.Job? = null
+
     fun loadSession(sessionId: Long) {
         _sessionId.value = sessionId
         viewModelScope.launch {
@@ -60,15 +69,16 @@ class WorkoutViewModel @Inject constructor(
                     exercise.id to workoutRepository.getPreviousSessionSets(exercise.id, sessionId)
                 }
                 _exercises.value = planExercises.map { exercise ->
+                    val prevSets = prevSetsMap[exercise.id] ?: emptyList()
                     WorkoutExercise(
                         exerciseId = exercise.id,
                         exerciseName = exercise.name,
-                        previousSets = prevSetsMap[exercise.id] ?: emptyList()
+                        previousSets = prevSets,
+                        suggestedWeight = calculateSuggestedWeight(prevSets)
                     )
                 }
             }
-        }
-        viewModelScope.launch {
+            // Collect sets only after plan exercises are loaded to avoid race condition
             sets.collect { allSets ->
                 val grouped = allSets.groupBy { it.exerciseId }
                 _exercises.update { current ->
@@ -114,34 +124,53 @@ class WorkoutViewModel @Inject constructor(
         val previousSets = workoutRepository.getPreviousSessionSets(exerciseId, sessionId)
         _exercises.update { current ->
             if (current.none { it.exerciseId == exerciseId }) {
-                current + WorkoutExercise(exerciseId, exerciseName, previousSets = previousSets)
+                current + WorkoutExercise(
+                    exerciseId = exerciseId,
+                    exerciseName = exerciseName,
+                    previousSets = previousSets,
+                    suggestedWeight = calculateSuggestedWeight(previousSets)
+                )
             } else current
         }
     }
 
-    fun finishWorkout(onDone: () -> Unit) = viewModelScope.launch {
+    private fun calculateSuggestedWeight(previousSets: List<WorkoutSetEntity>): Double? {
+        if (previousSets.isEmpty()) return null
+        val maxWeight = previousSets.maxOf { it.weight }
+        val allHitTarget = previousSets.all { it.reps >= 5 }
+        return if (allHitTarget) roundToNearestPlate(maxWeight + 2.5) else maxWeight
+    }
+
+    private fun roundToNearestPlate(weight: Double): Double =
+        Math.round(weight / 2.5) * 2.5
+
+    fun finishWorkout(onDone: (Long) -> Unit) = viewModelScope.launch {
         val sessionId = _sessionId.value ?: return@launch
         workoutRepository.finishSession(sessionId)
         workoutRepository.checkAndUnlockAchievements(achievementRepository)
         stopRestTimer()
         updateWidget()
-        onDone()
+        onDone(sessionId)
     }
 
     private fun startRestTimer(seconds: Int) {
+        timerJob?.cancel()
         _restTimerRunning.value = true
-        val intent = Intent(context, RestTimerService::class.java).apply {
-            action = RestTimerService.ACTION_START
-            putExtra(RestTimerService.EXTRA_DURATION, seconds)
+        _restTotalSeconds.value = seconds
+        _restSecondsLeft.value = seconds
+        timerJob = viewModelScope.launch {
+            for (remaining in seconds downTo 0) {
+                _restSecondsLeft.value = remaining
+                delay(1_000)
+            }
+            _restTimerRunning.value = false
         }
-        context.startForegroundService(intent)
     }
 
     fun stopRestTimer() {
+        timerJob?.cancel()
         _restTimerRunning.value = false
-        context.startService(Intent(context, RestTimerService::class.java).apply {
-            action = RestTimerService.ACTION_STOP
-        })
+        _restSecondsLeft.value = 0
     }
 
     private fun vibrateOnComplete() {

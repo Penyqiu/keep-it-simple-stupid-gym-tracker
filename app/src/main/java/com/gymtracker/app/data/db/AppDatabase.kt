@@ -6,6 +6,8 @@ import com.gymtracker.app.data.db.dao.*
 import com.gymtracker.app.data.db.entity.*
 import com.gymtracker.app.data.db.migrations.MIGRATION_1_2
 import com.gymtracker.app.data.db.migrations.MIGRATION_2_3
+import com.gymtracker.app.data.db.migrations.MIGRATION_3_4
+import com.gymtracker.app.data.db.migrations.MIGRATION_4_5
 
 @Database(
     entities = [
@@ -17,7 +19,7 @@ import com.gymtracker.app.data.db.migrations.MIGRATION_2_3
         BodyWeightEntity::class,
         AchievementEntity::class
     ],
-    version = 3,
+    version = 5,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -29,6 +31,6 @@ abstract class AppDatabase : RoomDatabase() {
 
     companion object {
         const val DATABASE_NAME = "gymtracker.db"
-        val migrations = arrayOf(MIGRATION_1_2, MIGRATION_2_3)
+        val migrations = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
     }
 }

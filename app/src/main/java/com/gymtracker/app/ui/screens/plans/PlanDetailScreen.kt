@@ -1,19 +1,37 @@
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+
 package com.gymtracker.app.ui.screens.plans
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.gymtracker.app.R
 import com.gymtracker.app.data.db.entity.ExerciseEntity
 import com.gymtracker.app.ui.viewmodel.PlanDetailViewModel
+
+private val WEEKDAYS = listOf(
+    1 to R.string.day_mon,
+    2 to R.string.day_tue,
+    3 to R.string.day_wed,
+    4 to R.string.day_thu,
+    5 to R.string.day_fri,
+    6 to R.string.day_sat,
+    7 to R.string.day_sun
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -28,6 +46,7 @@ fun PlanDetailScreen(
     val plan by viewModel.plan.collectAsState()
     val exercises by viewModel.exercises.collectAsState()
     val allExercises by viewModel.allExercises.collectAsState()
+    val scheduledDays by viewModel.scheduledDays.collectAsState()
     var showAddDialog by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -66,6 +85,30 @@ fun PlanDetailScreen(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             contentPadding = PaddingValues(vertical = 16.dp)
         ) {
+            item {
+                Text(
+                    text = stringResource(R.string.training_schedule),
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Spacer(Modifier.height(12.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    WEEKDAYS.forEach { (day, labelRes) ->
+                        DayCircle(
+                            label = stringResource(labelRes),
+                            selected = day in scheduledDays,
+                            onClick = { viewModel.toggleScheduledDay(day) },
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
+                Spacer(Modifier.height(16.dp))
+                HorizontalDivider()
+                Spacer(Modifier.height(8.dp))
+            }
             itemsIndexed(exercises) { index, exercise ->
                 PlanExerciseItem(
                     exercise = exercise,
@@ -151,6 +194,36 @@ private fun PlanExerciseItem(
 }
 
 @Composable
+private fun DayCircle(
+    label: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val bgColor = if (selected) MaterialTheme.colorScheme.primary
+                  else MaterialTheme.colorScheme.surfaceVariant
+    val contentColor = if (selected) MaterialTheme.colorScheme.onPrimary
+                       else MaterialTheme.colorScheme.onSurfaceVariant
+
+    Surface(
+        shape = CircleShape,
+        color = bgColor,
+        modifier = modifier
+            .aspectRatio(1f)
+            .clickable(onClick = onClick)
+    ) {
+        Box(contentAlignment = Alignment.Center) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelSmall,
+                fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
+                color = contentColor
+            )
+        }
+    }
+}
+
+@Composable
 private fun AddExerciseDialog(
     allExercises: List<ExerciseEntity>,
     onAdd: (Long) -> Unit,
@@ -171,13 +244,21 @@ private fun AddExerciseDialog(
                 )
                 Spacer(Modifier.height(8.dp))
                 val filtered = allExercises.filter { it.name.contains(searchQuery, ignoreCase = true) }
-                Column(Modifier.heightIn(max = 300.dp)) {
+                Column(
+                    modifier = Modifier
+                        .heightIn(max = 300.dp)
+                        .verticalScroll(rememberScrollState())
+                ) {
                     filtered.forEach { exercise ->
                         TextButton(
                             onClick = { onAdd(exercise.id) },
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
+                            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
                         ) {
-                            Column {
+                            Column(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalAlignment = androidx.compose.ui.Alignment.Start
+                            ) {
                                 Text(exercise.name)
                                 Text(
                                     exercise.muscleGroup,

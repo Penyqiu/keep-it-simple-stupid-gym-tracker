@@ -6,9 +6,11 @@ import androidx.glance.*
 import androidx.glance.action.actionStartActivity
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.provideContent
+import androidx.glance.appwidget.updateAll
 import androidx.glance.layout.*
 import androidx.glance.unit.ColorProvider
 import androidx.compose.ui.unit.dp
+import androidx.glance.action.clickable
 import androidx.glance.material3.ColorProviders
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle

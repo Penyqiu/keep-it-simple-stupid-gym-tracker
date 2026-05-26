@@ -14,4 +14,13 @@ interface BodyWeightDao {
 
     @Delete
     suspend fun deleteEntry(entry: BodyWeightEntity)
+
+    @Query("SELECT * FROM body_weight_entries ORDER BY id")
+    suspend fun getAllEntriesOnce(): List<BodyWeightEntity>
+
+    @Query("DELETE FROM body_weight_entries")
+    suspend fun deleteAllEntries()
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertForRestore(entry: BodyWeightEntity)
 }

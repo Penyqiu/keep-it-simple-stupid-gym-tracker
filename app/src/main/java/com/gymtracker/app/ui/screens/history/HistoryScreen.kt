@@ -1,3 +1,5 @@
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+
 package com.gymtracker.app.ui.screens.history
 
 import androidx.compose.foundation.layout.*
@@ -26,6 +28,7 @@ import com.gymtracker.app.ui.viewmodel.HistoryViewModel
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.YearMonth
+import java.time.format.TextStyle
 import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -39,7 +42,7 @@ fun HistoryScreen(
     val context = LocalContext.current
 
     val sessionsByDate by viewModel.sessionsByDate.collectAsState()
-    val workoutDates by viewModel.workoutDates.collectAsState()
+    val workoutsByDate by viewModel.workoutsByDate.collectAsState()
 
     val csvLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.CreateDocument("text/csv")
@@ -73,7 +76,7 @@ fun HistoryScreen(
                     onRepeat = { session -> viewModel.repeatWorkout(session, onRepeatWorkout) },
                     onDelete = viewModel::deleteSession
                 )
-                1 -> CalendarTab(workoutDates = workoutDates)
+                1 -> CalendarTab(workoutsByDate = workoutsByDate)
             }
         }
     }
@@ -148,28 +151,44 @@ private fun SessionHistoryCard(
 }
 
 @Composable
-private fun CalendarTab(workoutDates: Set<LocalDate>) {
+private fun CalendarTab(workoutsByDate: Map<LocalDate, List<String?>>) {
     var currentMonth by remember { mutableStateOf(YearMonth.now()) }
+    var selectedDate by remember { mutableStateOf<LocalDate?>(null) }
+
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = { currentMonth = currentMonth.minusMonths(1) }) {
+            IconButton(onClick = {
+                currentMonth = currentMonth.minusMonths(1)
+                selectedDate = null
+            }) {
                 Icon(Icons.Default.ChevronLeft, contentDescription = null)
             }
+            val monthName = currentMonth.month
+                .getDisplayName(TextStyle.FULL_STANDALONE, Locale.getDefault())
+                .replaceFirstChar(Char::uppercaseChar)
             Text(
-                "${currentMonth.month.name} ${currentMonth.year}",
+                "$monthName ${currentMonth.year}",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
-            IconButton(onClick = { currentMonth = currentMonth.plusMonths(1) }) {
+            IconButton(onClick = {
+                currentMonth = currentMonth.plusMonths(1)
+                selectedDate = null
+            }) {
                 Icon(Icons.Default.ChevronRight, contentDescription = null)
             }
         }
         Spacer(Modifier.height(8.dp))
-        val daysOfWeek = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+        val daysOfWeek = listOf(
+            stringResource(R.string.day_mon), stringResource(R.string.day_tue),
+            stringResource(R.string.day_wed), stringResource(R.string.day_thu),
+            stringResource(R.string.day_fri), stringResource(R.string.day_sat),
+            stringResource(R.string.day_sun)
+        )
         Row(modifier = Modifier.fillMaxWidth()) {
             daysOfWeek.forEach { day ->
                 Text(
@@ -182,39 +201,83 @@ private fun CalendarTab(workoutDates: Set<LocalDate>) {
             }
         }
         Spacer(Modifier.height(8.dp))
-        val firstDay = currentMonth.atDay(1)
-        val firstDayOfWeek = (firstDay.dayOfWeek.value - 1)
+        val firstDayOfWeek = currentMonth.atDay(1).dayOfWeek.value - 1
         val totalDays = currentMonth.lengthOfMonth()
-        val cells = firstDayOfWeek + totalDays
-        val rows = (cells + 6) / 7
+        val rows = (firstDayOfWeek + totalDays + 6) / 7
         for (row in 0 until rows) {
             Row(modifier = Modifier.fillMaxWidth()) {
                 for (col in 0 until 7) {
                     val dayNum = row * 7 + col - firstDayOfWeek + 1
                     if (dayNum in 1..totalDays) {
                         val date = currentMonth.atDay(dayNum)
-                        val isWorkout = date in workoutDates
+                        val isWorkout = date in workoutsByDate
                         val isToday = date == LocalDate.now()
+                        val isSelected = date == selectedDate
                         Surface(
-                            modifier = Modifier.weight(1f).aspectRatio(1f).padding(2.dp),
+                            modifier = Modifier
+                                .weight(1f)
+                                .aspectRatio(1f)
+                                .padding(2.dp),
                             shape = MaterialTheme.shapes.small,
                             color = when {
+                                isSelected -> MaterialTheme.colorScheme.tertiary
                                 isWorkout -> MaterialTheme.colorScheme.primary
                                 isToday -> MaterialTheme.colorScheme.secondaryContainer
                                 else -> Color.Transparent
-                            }
+                            },
+                            onClick = { selectedDate = if (isSelected) null else date }
                         ) {
                             Box(contentAlignment = Alignment.Center) {
                                 Text(
                                     text = dayNum.toString(),
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = if (isWorkout) MaterialTheme.colorScheme.onPrimary
-                                            else MaterialTheme.colorScheme.onSurface
+                                    color = when {
+                                        isSelected || isWorkout -> MaterialTheme.colorScheme.onPrimary
+                                        else -> MaterialTheme.colorScheme.onSurface
+                                    }
                                 )
                             }
                         }
                     } else {
                         Spacer(modifier = Modifier.weight(1f))
+                    }
+                }
+            }
+        }
+
+        val selectedWorkouts = selectedDate?.let { workoutsByDate[it] }
+        if (selectedDate != null) {
+            Spacer(Modifier.height(16.dp))
+            Card(modifier = Modifier.fillMaxWidth()) {
+                Column(modifier = Modifier.padding(12.dp)) {
+                    Text(
+                        text = selectedDate!!.toString(),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    if (selectedWorkouts.isNullOrEmpty()) {
+                        Text(
+                            text = stringResource(R.string.no_workouts_on_day),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    } else {
+                        selectedWorkouts.forEach { name ->
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    Icons.Default.FitnessCenter,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(16.dp),
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Spacer(Modifier.width(8.dp))
+                                Text(
+                                    name ?: stringResource(R.string.quick_workout),
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
+                        }
                     }
                 }
             }

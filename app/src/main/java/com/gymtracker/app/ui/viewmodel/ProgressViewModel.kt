@@ -13,6 +13,14 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+data class DetailedStats(
+    val totalWorkouts: Int,
+    val totalVolume: Double,
+    val longestStreak: Int,
+    val favouriteDayOfWeek: String?,
+    val topExercises: List<Pair<String, Int>>
+)
+
 data class ExerciseProgress(
     val exercise: ExerciseEntity,
     val sets: List<WorkoutSetEntity>,
@@ -52,6 +60,18 @@ class ProgressViewModel @Inject constructor(
 
     val bodyWeightEntries = bodyWeightRepository.getAllEntries()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    val detailedStats: StateFlow<DetailedStats?> = workoutRepository.getAllSessions()
+        .map {
+            DetailedStats(
+                totalWorkouts = workoutRepository.getTotalWorkoutCount(),
+                totalVolume = workoutRepository.getTotalVolume(),
+                longestStreak = workoutRepository.getLongestStreak(),
+                favouriteDayOfWeek = workoutRepository.getFavouriteDayOfWeek(),
+                topExercises = workoutRepository.getTopExercises(5)
+            )
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     fun selectExercise(exerciseId: Long) {
         _selectedExerciseId.value = exerciseId

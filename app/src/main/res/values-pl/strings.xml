@@ -126,7 +126,72 @@
     <string name="ach_weekly_5_title">5 dni w tygodniu</string>
     <string name="ach_weekly_5_desc">Trenuj 5 razy w jednym tygodniu</string>
 
+    <!-- Przypomnienia -->
+    <string name="reminders">Przypomnienia</string>
+    <string name="reminders_enable">Przypomnienia o treningu</string>
+    <string name="reminders_enable_desc">Powiadamiaj mnie w zaplanowane dni treningowe</string>
+    <string name="reminder_time">Godzina przypomnienia</string>
+    <string name="reminder_days">Aktywne dni</string>
+    <string name="reminder_title">Czas na trening! 💪</string>
+    <string name="reminder_body">Masz zaplanowany trening na dziś. Do dzieła!</string>
+    <string name="reminder_channel_name">Przypomnienia o treningu</string>
+
+    <!-- Dni tygodnia -->
+    <string name="day_mon">Pon</string>
+    <string name="day_tue">Wt</string>
+    <string name="day_wed">Śr</string>
+    <string name="day_thu">Czw</string>
+    <string name="day_fri">Pt</string>
+    <string name="day_sat">Sob</string>
+    <string name="day_sun">Nd</string>
+
+    <!-- Harmonogram planu -->
+    <string name="training_schedule">Harmonogram treningów</string>
+
+    <!-- Podsumowanie treningu -->
+    <string name="workout_summary">Podsumowanie treningu</string>
+    <string name="duration">Czas</string>
+    <string name="total_volume">Łączna objętość</string>
+    <string name="total_sets">Serie</string>
+    <string name="new_pr">Nowy rekord!</string>
+    <string name="done">Gotowe</string>
+    <string name="min">min</string>
+
+    <!-- Statystyki postępów -->
+    <string name="exercise_tab">Ćwiczenia</string>
+    <string name="stats">Statystyki</string>
+    <string name="longest_streak">Najlepsza passa</string>
+    <string name="favourite_day">Ulubiony dzień</string>
+    <string name="top_exercises">Najczęstsze ćwiczenia</string>
+    <string name="times">razy</string>
+
+    <!-- Kopia zapasowa -->
+    <string name="backup_restore">Kopia zapasowa</string>
+    <string name="export_backup">Eksportuj kopię</string>
+    <string name="export_backup_desc">Zapisz wszystkie dane do pliku JSON</string>
+    <string name="import_backup">Importuj kopię</string>
+    <string name="import_backup_desc">Przywróć dane z pliku JSON</string>
+    <string name="import_warning_title">Nadpisać dane?</string>
+    <string name="import_warning_body">Zastąpi to trwale wszystkie bieżące dane danymi z kopii. Tej operacji nie można cofnąć.</string>
+    <string name="backup_success">Kopia zapisana</string>
+    <string name="restore_success">Dane przywrócone</string>
+    <string name="restore_error">Nie udało się przywrócić kopii</string>
+
+    <!-- Szczegóły ćwiczenia -->
+    <string name="exercise_detail">Info o ćwiczeniu</string>
+    <string name="sessions_done">Wykonane sesje</string>
+    <string name="no_record_yet">Brak rekordu</string>
+    <string name="previous_session">Poprzednia sesja</string>
+
+    <!-- Home / Plany -->
+    <string name="exercises_short">ćw.</string>
+    <string name="great_workout">Dobra robota!</string>
+    <string name="new_prs_count">%1$d nowych rekordów!</string>
+    <string name="first_time">Pierwszy raz!</string>
+
     <!-- Ogólne -->
     <string name="back">Wstecz</string>
     <string name="export_csv">Eksportuj CSV</string>
+    <string name="no_workouts_on_day">Brak treningów</string>
+    <string name="prev_set">Poprz.: %1$s kg × %2$d</string>
 </resources>

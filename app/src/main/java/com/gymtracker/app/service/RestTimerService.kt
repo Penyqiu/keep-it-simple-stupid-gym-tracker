@@ -2,6 +2,8 @@ package com.gymtracker.app.service
 
 import android.app.*
 import android.content.Intent
+import android.content.pm.ServiceInfo
+import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.gymtracker.app.R
@@ -41,7 +43,12 @@ class RestTimerService : Service() {
 
     private fun startTimer(durationSeconds: Int) {
         timerJob?.cancel()
-        startForeground(NOTIFICATION_ID, buildNotification(durationSeconds))
+        val notification = buildNotification(durationSeconds)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            startForeground(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_HEALTH)
+        } else {
+            startForeground(NOTIFICATION_ID, notification)
+        }
         timerJob = serviceScope.launch {
             for (remaining in durationSeconds downTo 0) {
                 updateNotification(remaining)
